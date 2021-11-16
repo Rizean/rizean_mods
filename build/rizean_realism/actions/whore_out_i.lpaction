@@ -6,8 +6,8 @@ MINUTES: 5 - 10
 TIMEOUT_MINUTES: 0
 ALSO_TIMEOUT: 
 EFFECTS: mood -1 (END), energy -1 (END)
-CONDITIONS: companioncount == 0 (STAT_COMPARE), perversion > 50 (STAT_COMPARE)
+CONDITIONS: companioncount == 0 (STAT_COMPARE)
 MOVE_FIRST: true
 SCENE_ALWAYS: whore_out_i
 ANIMATION: 
-WHO: Actor = getTarget(); If Actor.isTemporary() && [WHERE == brothel || WHERE == hotel || WHERE == bar || WHERE == nightclub || WHERE == pub || WHERE == stripclub] && !Actor.isCreature() && !Actor.isAt(work)
+WHO: Actor = getTarget(); If Actor.isTemporary() && [perversion > 50 || money < -2000] && [WHERE == brothel || WHERE == hotel || WHERE == bar || WHERE == nightclub || WHERE == pub || WHERE == stripclub] && !Actor.isCreature() && !Actor.isAt(work)

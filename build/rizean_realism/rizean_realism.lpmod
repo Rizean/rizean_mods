@@ -2,5 +2,6 @@ MODULE_UNIQUEID: rizean_realism
 MODULE_NAME: Rizean Realism
 MODULE_AUTHOR: Rizean
 MODULE_LINK: 
-MODULE_DESCRIPTION: Realism - Overrides many actions to add a degree of realism i.e., perversion 0 can't whore them self's out
+MODULE_DESCRIPTION: Realism - Overrides many actions to add a degree of realism i.e., perversion 0 can't whore them self's out. This should be the first mod you load to give other mods the chance to override it.
 MODULE_REQUIREMENTS: 
+MODULE_VERSION: 0.1.0

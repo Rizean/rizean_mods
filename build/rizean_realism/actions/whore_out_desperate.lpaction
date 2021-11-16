@@ -1,6 +1,6 @@
 ACTION_UNIQUEID: whore_out_desperate
 ACTION_NAME: Whore myself out (desperate)
-WHERE: sexwork, interaction
+WHERE: sexwork
 WHEN: 0 - 24
 MINUTES: 30 - 60
 TIMEOUT_MINUTES: 0
