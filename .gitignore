@@ -26,3 +26,4 @@ lpjs.env
 /coverage/lcov-report/
 /package-lock.json
 /yarn.lock
+/intermediate
