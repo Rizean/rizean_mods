@@ -1,0 +1,19 @@
+WHAT: none
+WHERE: none
+WHEN: 0 - 24
+WHO: none
+OTHER:
+
+sceneStart()
+  "Which dating app should I use?"
+  0:: "OK! Love"
+  1:: Player:likes_older > 15:: "Seeker (Young and Old)"
+  2:: "Never mind"
+
+  If 0
+    followUp(fantasy_dating_app)
+  ElseIf 1
+    followUp(oldyoung_dating_app)
+  EndIf
+sceneEnd()
+

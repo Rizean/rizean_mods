@@ -1,0 +1,19 @@
+{
+  "name": "lpjsexample",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "author": "Rizean@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "lifeplayjs": "file:../../LifePlay.js",
+    "nodemon": "^2.0.14"
+  },
+  "scripts": {
+    "start": "nodemon --watch src src",
+    "build": "node ./src build",
+    "postinstall": "npm install --no-cache https://github.com/Rizean/LifePlay.js.git",
+    "update:lpjs": "npm install --no-cache https://github.com/Rizean/LifePlay.js.git",
+    "use:dev:lpjs": "npm install --no-cache D:\\projects\\LifePlay.js"
+  }
+}

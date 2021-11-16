@@ -1,0 +1,93 @@
+WHAT: all,  -go_to_the_bathroom
+WHERE: nightclub,  bar
+WHEN: 0 - 24
+WHO: none
+OTHER: If Random(0, 100) < 2;
+
+sceneStart()
+  Actor = generatePerson()
+  perversionScore = Player:perversion + Player:masochist
+  "I noticed a creepy guy pouring some suspicious powder into a pretty girl's drink!"
+  0:: "Ignore"
+  1:: "Stop him"
+  2:: perversionScore > 100 && Player.isFemale():: "Drink it"
+
+  If 0
+    "It's none of my business. I don't want to get in trouble."
+    Player:masochist += Random(0, 0.5)
+    "Thankfully, the girl didn't end up drinking it and no-one was harmed - I would feel very guilty otherwise."
+  ElseIf 1
+    Player(Furious):: "Hey! What the fuck do you think you're doing?"
+    Player:karma += 5
+    Player:masochist -= Random(0, 0.5)
+    "The guy ran away as soon as I shouted out and exposed his dirty trick - not fast enough for the security guards though ..."
+    Actor = generatePerson()
+    Actor.blendPreset(fashion_model_F)
+    Actor.randomizeFace()
+    Actor.randomizeHairs()
+    Actor.dress()
+    Actor.show(2)
+    Actor:rapportwithplayer += 40
+    If Actor.isInterestedIn(Player)
+      Actor:attractionToPlayer += Random(0, 50)
+    EndIf
+    Actor(Happy):: "Oh my god! You saved me from that creep. I don't know how to thank you ..."
+    0:: "Nothing"
+    1:: "Ask for her number"
+
+    If 0
+      Player:karma += 2.5
+      Player(Happy):: "Don't worry about it. It's only the right thing to do."
+    Else
+      "I suggested that we exchange numbers and hang out another day. Of course, <Actor.name> didn't hesitate to give her number to her savior."
+      exchangeContact(Actor)
+    EndIf
+  ElseIf 2
+    Player:perversion += Random(0, 1)
+    Player:masochist += Random(0, 1)
+    Actor = generatePersonTemporary(bodybuilder, creep)
+    Actor:likes_vaginal => Random(50, 100)
+    Actor:fertility => Random(2, 5)
+    Actor:masochist => Random(-100, -50)
+    Actor:likes_rough => Random(50, 100)
+    Actor:likes_anal => Random(50, 100)
+    Actor:likes_bondage => Random(50, 100)
+    Actor:prone_to_orgasm => Random(50, 100)
+    Actor:stock_condom => Random(5, 20)
+    Actor:arousal => Random(75, 85)
+    Actor:rapportwithplayer => 50 + Random(1, 10)
+    Actor:rapportwithplayer => 50 + Random(1, 10)
+    Actor.dress()
+    Actor.show(0)
+    Girl = generatePersonTemporary(normal_F)
+    Girl.dress()
+    Girl.show(0)
+    "I walk up to the pair and pickup the drink before either of them can say anything."
+    "I look at the creep, giving them a knowing look and smile."
+    Player(Shocked):: "Bottoms up!"
+    "I down the drink in one go."
+    "It burns all the way down and has a slightly off taste that could have been easily missed."
+    "The creep turns to the girl."
+    Actor(Evil):: "Get lost!"
+    Girl(Confused):: "What the fuck?! Never mind, not my type anyways."
+    "As the girl walks off the creep takes me by my hand and leads me outside."
+    Girl.hide()
+    setBackground(street)
+    "What ever was in the drink must have been strong as I am already feeling it's effects."
+    Player:intoxication => 100
+    Player.stripOne()
+    "Starts roughly stripping my cloths off. I don't even try to put up a fight."
+    Player.stripOne()
+    "It doesn't take him long."
+    Player.stripOne()
+    "To get me nude."
+    Actor.dressExcept(Bottom_Under, Bottom)
+    talkNonConsensual()
+    filter(Aggressive)
+    sexNoAffair(Actor, Player)
+    "As soon as the creep is finished they are nowhere to be seen."
+    Actor.hide()
+  EndIf
+sceneEnd()
+
+timeout(600, spiced_drink)

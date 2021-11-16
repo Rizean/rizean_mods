@@ -1,0 +1,937 @@
+WHAT: none
+WHERE: none
+WHEN: 0 - 24
+WHO: none
+OTHER:
+
+sceneStart()
+  Target = getTarget()
+  growthRate = 1.035
+  intoxicationBonus = power(growthRate, Player:intoxication)
+  arousalBonus = power(growthRate, Player:arousal)
+  targetIntoxicationBonus = power(growthRate, Target:intoxication)
+  willpower = Player:energy / 100 * Player:intelligence
+  isPublic = WHERE || Home || WHERE || residential
+  publicScore = 5
+  If isPublic
+    publicScore = -5
+  EndIf
+  targetPerversionScore = Target:perversion + targetIntoxicationBonus - Target:masochist + publicScore
+  targetWillForce = targetPerversionScore > 150
+  If targetWillForce
+    Target:likes_rough += Random(25, 100)
+    Target:likes_vaginal += Random(25, 100)
+    Target:likes_anal += Random(25, 100)
+    Target:prone_to_orgasm += Random(25, 100)
+  EndIf
+  playerSubmissiveScore = Player:masochist + intoxicationBonus
+  playerPerversionScore = Player:perversion + Player:masochist + intoxicationBonus
+  isWearingUnderwear = Player.isEquipped(Bottom_Under)
+  isWearingBra = Player.isEquipped(Top) && Player.isEquipped(Top_Under)
+  "I let me phone 'accidentally' slide out of my hand."
+  Player(Flirty):: "Opps..."
+  "I bend over to pick it up making sure <Target.he_or_she> has a 'good' view."
+  If targetPerversionScore >= 100
+    "Suddenly, I feel a hand on my butt!"
+    0:: playerPerversionScore < 100:: "This is more than I wanted, push the hand away"
+    1:: playerPerversionScore >= 100:: "A bit more than I wanted, push the hand away"
+    2:: playerPerversionScore >= 100:: "Ignore"
+    3:: playerPerversionScore >= 100 && Player:masochist > 50:: "Meekly 'try' to push the hand away and 'fail'"
+    4:: playerPerversionScore >= 100:: "Um, what do you think your doing?"
+
+    If choice == 0 || choice == 1 && targetWillForce
+      "<Target.He_or_She> seems a bit disappointed but gives me a smile anyways."
+      Player:perversion -= 0.3
+      Target:attractionToPlayer -= 0.1
+      timeout(10, rizean_cnc_dropFlirt)
+    ElseIf choice == 0 && isPublic
+      "<Target.He_or_She> doesn't seem to get the hint and comes on strong."
+      "I struggle to keep <Target.his_or_her> hands off me."
+      If Target.isFemale()
+        Player(Anger):: "Back the fuck off BITCH!"
+      Else
+        Player(Anger):: "Get your hands of me you JACKASS!"
+      EndIf
+      "My outburst draws the attention of others which encourages <Target.him_or_her> to walk away leaving."
+      Target.hide()
+      timeout(200, rizean_cnc_dropFlirt)
+    ElseIf choice == 0 || choice == 1
+      temp = getPersonHere()
+      opportunistCount = 0
+      shouldStop = false
+      While temp.isValid() && shouldStop
+        If temp:masochist < -50
+          If opportunistCount == 0
+            name = temp
+            opportunist0 = getPersonHere()
+            opportunistCount += 1
+            Target:martial += temp:martial
+          ElseIf opportunistCount == 1
+            name = temp
+            opportunist1 = getPersonHere()
+            opportunistCount += 1
+            Target:martial += temp:martial
+          ElseIf opportunistCount == 2
+            name = temp
+            opportunist2 = getPersonHere()
+            opportunistCount += 1
+            Target:martial += temp:martial
+          ElseIf opportunistCount == 3
+            name = temp
+            opportunist3 = getPersonHere()
+            opportunistCount += 1
+            Target:martial += temp:martial
+          Else
+            temp.hide()
+          EndIf
+        Else
+          If temp.isMale() && temp:martial > Target:martial + opportunistCount
+            shouldStop = true
+            name = temp
+            hero = getPersonHere()
+            total = opportunistCount + 1
+            If total > 1
+              "One dude steps up in my defense against <total> others!"
+              "He takes one at the group gathers against me and just smiles."
+              hero(Serene):: "Bring it!"
+              Target(Angry):: "Get him!"
+              "My hero doesn't wait for the group to charge."
+              "He steps over one of my attackers, kicking them in the shin and then slamming his fist into their nose quickly taking the fight out of them."
+              "My attacker comes up behind my hero thinking to take them by surprise only to be caught off guard when my hero spins around planting an elbow in their face!"
+              "It seems like the fight only just started, but the group is already scattering!"
+              Target.hide()
+              opportunist0.hide()
+              opportunist1.hide()
+              opportunist2.hide()
+              opportunist3.hide()
+            Else
+              "One dude steps up in my defense against my attacker."
+              "My attacker takes one look at him and decided it's not worth it and leaves."
+              Target.hide()
+            EndIf
+          Else
+            temp.hide()
+          EndIf
+        EndIf
+      EndWhile
+      If hero.isValid()
+        "I run over to my hero and hug them!"
+        hero(Grin):: "Hi, my name is <hero.name>."
+        Player(Happy):: "Hello, <hero.name>, my name is <Player.name>."
+        Player(Happy):: "I don't know how I could every repay you!"
+        Player(Anxious):: "Um..."
+        0:: "I could use an escort home... wink"
+        1:: "Kiss Goodbye"
+
+        If 0
+          moveTo(home)
+          "We arrive safely back at my home."
+          "Should I reward my hero?"
+          0:: "Reward them"
+          1:: "Kiss Goodbye"
+
+          If 0
+            If hero.isInterestedIn(Player)
+              While Player.isNude()
+                Player.stripOne()
+                Random
+                  animatePair(hero, Player, hug)
+                  animatePair(hero, Player, kiss)
+                EndRandom
+              EndWhile
+              sex(hero, Player)
+              Player:: "We should do this again some times. Here's my number."
+              exchangeContact(hero)
+            Else
+              hero:: "Sorry, your not really my type."
+              hero:: "Stay safe, and um you should pick less seedy places to hang out."
+              hero.hide()
+              "Dam... after all that I'm left horny and frustrated."
+              sex(Player, )
+            EndIf
+          ElseIf 1
+            animatePair(Player, hero, Kiss)
+            "The kiss seems to last forever, and our hands start to roam."
+            animatePair(Player, hero, Hug)
+            "Eventually I pull away from <hero.name>."
+            Player(Happy):: "Thank you again for all you have done, I don't know how I will ever repay you."
+            If hero.isInterestedIn(Player) && hero:masochist < -20
+              "<hero.name> gives me one of those 'really' looks."
+              hero(Surprised):: "After all I have done for you tonight, and the way you lead me on."
+              hero(Surprised):: "I get it now. Your one of those <Player.guy_or_girl>s who fantasies about being forced?"
+              "Sheepishly, I don't say anything and just look away."
+              hero(Excited):: "Fine then. I've never done that before, but I can give it a try."
+              "<hero.name> grabs me and starts pulling my clothes off careful not to rip anything or hurt me."
+              Player.stripOne()
+              "There is no way I could resist this <hero.guy_or_girl>, what should I do?"
+              0:: "Resist anyways"
+              1:: "Give in"
+              2:: "Ask them to be a bit rougher"
+
+              If 0
+                hero:likes_rough += Random(1, 5)
+                "I struggle against <hero.name> and only manage to annoy them."
+                hero(Annoyed):: "Really?"
+                hero(Annoyed):: "I guess I have a lot to learn still."
+                hero(Annoyed):: "But I do know how to handle petulant little <Player.boy_or_girl>s."
+                Player.stripOne()
+                "With little effort <hero.name> stripped off my remaining clothing."
+                Player.strip()
+                "Forced me over his knee..."
+                "...and begin to rain down blows."
+                "THWACK!"
+                Player(Pain):: "Aaaaah!"
+                "WACK!"
+                Player(Pain):: "OH!"
+                "KRACKKK!"
+                Player(Pain):: "Ieeee!"
+                "SMACK!"
+                Player(Pain):: "Oooooo!"
+                Player(Pain):: "Please stop now. I'll be a good <Player.boy_or_girl>"
+                hero(Grin):: "Hmmm. Will see about that."
+                "For a beginner <hero.he_or_she> was..."
+                0:: "...not half bad."
+                1:: "...kind of weak."
+
+                If 0
+                  "Or maybe I'm more submissive or not quite as tough as I thought I was."
+                  Player:masochist += Random(0, 1)
+                  Player:likes_rough -= Random(0, 1)
+                ElseIf 1
+                  "Their blows where quite strong but, <hero.He_or_She> gave in at my first complaint."
+                  "Still not to bad for their first time."
+                  Player:likes_rough += Random(0, 1)
+                EndIf
+                hero:likes_rough += Random(0, 10)
+                hero:masochist -= Random(0, 10)
+                "Without further hesitation..."
+                filter(Aggressive)
+                talkNonConsensual()
+                sexNoAffair(hero, Player)
+                "Exhausted, I fall asleep."
+                Player.animate(sleep)
+                hero.animate(sleep)
+                passTime(2, 4)
+                hero.hide()
+                "Latter when I wake up I see that <hero.name> has left but they left me a note with their number."
+                "Call me. I'm sure we could 'arrange' something next time."
+                exchangeContact(hero)
+                hero:masochist -= Random(5, 20)
+                hero:perversion += Random(5, 10)
+              ElseIf 1
+                "I to exhausted to struggle against <hero.name> and just give in to them."
+                While Player.isNude()
+                  Player.stripOne()
+                  Random
+                    animatePair(hero, Player, hug)
+                    animatePair(hero, Player, kiss)
+                  EndRandom
+                EndWhile
+                sex(hero, Player)
+                "Without much preamble when we are done."
+                hero:: "Here's my number. Call me latter."
+                Player:: "What if I don't want to? You didn't exactly give me a choice."
+                hero(Evil):: "I'm still not giving you a choice."
+                Player(Excited):: "Oh..."
+                exchangeContact(hero)
+                hero:masochist -= Random(1, 2)
+                hero:perversion += Random(1, 2)
+              ElseIf 2
+                hero:likes_rough += Random(1, 2)
+                Player(Anxious):: "Um... could you be a bit rougher? Maybe a little more forceful?"
+                hero(Grin):: "Hmmm. You mean like this?"
+                "<hero.name> grabs me by the hair and pulls me into an embrace."
+                "<hero.His_or_Her> hands start groping at me roughly mercilessly squeezing my nipples."
+                "They weren't genital at all with my <Player.dick_or_pussy> using it like their own personal throw away toy."
+                Player(Excited):: "That's a good start."
+                While Player.isNude()
+                  Player.stripOne()
+                  Random
+                    animatePair(hero, Player, hug)
+                    animatePair(hero, Player, kiss)
+                  EndRandom
+                EndWhile
+                filter(Aggressive)
+                talkNonConsensual()
+                sexNoAffair(hero, Player)
+                "Exhausted, I fall asleep."
+                Player.animate(sleep)
+                passTime(2, 4)
+                hero.hide()
+                "<hero.name> loaded his number into my phone and left."
+                exchangeContact(hero)
+                hero:masochist -= Random(5, 20)
+                hero:perversion += Random(5, 10)
+              EndIf
+            Else
+              "<hero.name> seems disappointed."
+              hero(Tired):: "Take care of yourself <Player.name>. See you around"
+            EndIf
+          EndIf
+        ElseIf 1
+          "I lean in and give <hero.name> a kiss."
+          animatePair(Player, hero, Kiss)
+          Player:: "Here's my number. Give me a call sometimes."
+          exchangeContact(hero)
+          hero.hide()
+          moveTo(home)
+        EndIf
+      ElseIf opportunistCount > 0
+        Player.setNoRedress()
+        "As the group moves in on me, I think back to how this night started."
+        "When heading out I though..."
+        "maybe I'll find someone to be a little rough..."
+        "maybe I'll even find the right person to help me live out a fantasy..."
+        "...but this."
+        0:: "It's time to accept my fate."
+        1:: "Make a break for it."
+
+        If 1
+          "I run for it but <Target.he_or_she> was too fast and caught me."
+          "By instinct I scratch <Target.him_or_her> across the face."
+          "Instantly I know that was a mistake."
+          "<Target.him_or_her> strikes me in the the face."
+          "My vision blurs, and my ear starts ringing."
+          "More blows land on ribs..."
+          "...and one more to the gut knocking the wind out of me and dropping me to the floor."
+          Player.animate(KnockedOut)
+        EndIf
+        "The group moves in on me ripping my clothing off."
+        Player.strip()
+        Player.setNoRedress()
+        "They proceed to take turns on me."
+        Player:energy => 100
+        filter(Aggressive)
+        talkNonConsensual()
+        sexNoAffair(Target, Player)
+        If opportunist0.isValid()
+          Player:energy => 100
+          filter(Aggressive)
+          talkNonConsensual()
+          sexNoAffair(opportunist0, Player)
+        EndIf
+        If opportunist1.isValid()
+          Player:energy => 100
+          filter(Aggressive)
+          talkNonConsensual()
+          sexNoAffair(opportunist1, Player)
+        EndIf
+        If opportunist2.isValid()
+          Player:energy => 100
+          filter(Aggressive)
+          talkNonConsensual()
+          sexNoAffair(opportunist2, Player)
+        EndIf
+        If opportunist3.isValid()
+          Player:energy => 100
+          filter(Aggressive)
+          talkNonConsensual()
+          sexNoAffair(opportunist3, Player)
+        EndIf
+        If opportunist0.isValid() && opportunist1.isValid() && opportunist2.isValid() && opportunist3.isValid()
+          Player:energy => 100
+          filter(Aggressive)
+          talkNonConsensual()
+          sexNoAffair(Target, Player, opportunist0, opportunist1, opportunist2, opportunist3)
+        ElseIf opportunist0.isValid() && opportunist1.isValid() && opportunist2.isValid()
+          Player:energy => 100
+          filter(Aggressive)
+          talkNonConsensual()
+          sexNoAffair(Target, Player, opportunist0, opportunist1, opportunist2)
+        ElseIf opportunist0.isValid() && opportunist1.isValid()
+          Player:energy => 100
+          filter(Aggressive)
+          talkNonConsensual()
+          sexNoAffair(Target, Player, opportunist0, opportunist1)
+        ElseIf opportunist0.isValid()
+          Player:energy => 100
+          filter(Aggressive)
+          talkNonConsensual()
+          sexNoAffair(Target, Player, opportunist0)
+        EndIf
+        If 1
+          "Eventually I pass out."
+          passTime(48, 96)
+          setBackground(hospital)
+          Player.animate(na_sleep)
+          Player.dress(Knit-Onepiece-Dress_1_F)
+          Player:arousal => 0
+          Player:energy => Random(25, 75)
+          bill = Random(1000, 3000)
+          Player:money -= bill
+          "I woke up in the hospital a few days latter."
+          "Everything comes back to me in a flash."
+          "Just thinking about it..."
+          0:: "...makes me very aroused!"
+          1:: "...was an amazing experience, but I'll need some time to recover."
+          2:: "...was an amazing experience, but less not do that again."
+          3:: "...scares the hell out of me."
+
+          If 0
+            "I must be insane, but I wouldn't hesitate to do that again."
+            Player:arousal => 20
+            Player:likes_rough += Random(2, 3)
+            Player:masochist += Random(2, 3)
+            timeout(336, rizean_cnc_dropFlirt)
+          ElseIf 1
+            "That was way more that I was hoping, but I just might have to give that another try one day in the very distant future."
+            Player:likes_rough += Random(0, 1)
+            Player:masochist += Random(0, 1)
+            timeout(720, rizean_cnc_dropFlirt)
+          ElseIf 2
+            "I'm sure I will masturbate to that night many times over the coming months but doubt I will every do that every again."
+            timeout(1344, rizean_cnc_dropFlirt)
+          ElseIf 3
+            "That must have been one of the dumbest things I have ever done."
+            "I can only hope there are no other consequences."
+            Player:likes_rough -= Random(1, 5)
+            Player:masochist -= Random(1, 5)
+            timeout(8760, rizean_cnc_dropFlirt)
+          EndIf
+          passTime(24, 24)
+          "A day latter I am released from the hospital and head home."
+          moveTo(Home)
+          "Well shit..."
+          "There's a bill from the hospital ALREADY! Dam they move fast."
+          true = bill.convertToLocalCurrency()
+          "Between the money that was stolen from me, and the bill I'm out <lostMoney>"
+          "Sigh..."
+        Else
+          passTime(2, 4)
+          "Eventually they finish with me..."
+          Player.dress(Towel_1_F)
+          "My clothes are nowhere to be seen, but I manage to find a towel to cover my self with."
+          "I make my way home and draw more than a few curious looks."
+          moveTo(home)
+          "Thinking back over the events..."
+          0:: "...that was amazing!"
+          1:: "...was totally stupid, and I will never do that again!"
+
+          If 0
+            timeout(336, rizean_cnc_dropFlirt)
+          ElseIf 1
+            timeout(8760, rizean_cnc_dropFlirt)
+          EndIf
+        EndIf
+      Else
+        "todo dropFlirt_soloCNC"
+      EndIf
+      timeout(600, rizean_cnc_dropFlirt)
+    ElseIf 2
+      "Encouraged by lack of my resistances they slid their hand into my bottoms."
+      If isWearingUnderwear
+        "In a matter of seconds I feel their hand at the edge of my underwear!"
+      Else
+        Target(Flirty):: "You're quite the little slut, aren't you?"
+        If Player:perversion < 50
+          "I blush and look a way."
+          Player(Embarrassed):: "Um, I don't know what came over me."
+        Else
+          Player(Flirty):: "Mmm, only for someone like you."
+        EndIf
+      EndIf
+      0:: Player:perversion < 50:: "This has gone to far."
+      1:: "Stop this before it goes too far."
+      2:: Player:perversion > 50:: "Ignore"
+      3:: Player:perversion > 50:: "Meekly 'try' to stop them and 'fail'"
+      4:: playerPerversionScore > 150:: "Encourage them to keep going"
+
+      timeout(600, rizean_cnc_dropFlirt)
+    ElseIf 3
+      "I weakly try to <Target.his_or_her> hand away from my butt."
+      Target(Flirty):: "You're not really trying to stop me, are you?"
+      "I feel their hand slowly sliding into my bottoms."
+      "I give <Target.him_or_her> a stern look and use both my hand to 'try' and stop them."
+      "This is what they were waiting for."
+      "With both my hands busy they quickly slide their other hand into my top!"
+      If isWearingBra
+        "<Target.He_or_She> pushes my bra up..."
+      EndIf
+      "...and gives my nipple a hard squeeze!"
+      Player(Surprised):: "Oh! Wh..."
+      "Before I can finish asking 'What the hell they are doing?!?' <Target.He_or_She> leans in are starts making out with me."
+      Player:arousal += Player:masochist / 10
+      0:: Player:arousal < 60:: "This has gone too far, time to stop this."
+      1:: "Meekly try to push them away"
+      2:: Player:arousal > 60:: "Given in"
+
+      If 0
+        "I put all my effort into breaking free and finally manage to break away from <Target.his_or_her> kiss."
+        "With tears streaming down my face now."
+        Player(Scared):: "Stop, or I'll scream."
+        Target(Evil):: "No you won't. You wanted this."
+        Target(Evil):: "You're just a submissive little slut who wants to be used."
+        0:: "<Target.He_or_She>'s is right..."
+        1:: willpower - playerPerversionScore > 50:: "NO! <Target.He_or_She> was wrong, this had gone too far..."
+
+        If 0
+          Player(Shy):: "What now?"
+          If isWearingUnderwear || isWearingBra
+            "<Target.He_or_She> wipes the tears off my face."
+            If isPublic
+              Target:: "Go to the bathroom and take off you bra and underwear."
+              Player:: "..."
+              Player(Anxious):: "OK"
+              forced = true
+              loc = findNearbyBuilding(bathroom)
+              moveTo(loc)
+              "My fantasy had very quickly turned into a reality. Did I really want it?"
+              If forced
+                0:: Player:arousal > 60:: "My pussy was dripping wet. There was no doubt I really wanted this!"
+                1:: "Yes..."
+                2:: "No, but I had gone too far. <Target.He_or_She> was right though, so best I just get it over."
+
+              Else
+                0:: Player:arousal > 60:: "My pussy was dripping wet. There was no doubt I really wanted this!"
+                1:: "Yes..."
+
+              EndIf
+              If choice == 0 || choice == 1
+                "I smiled to myself and fixed my makeup."
+                If isWearingBra
+                  "I slide off my bra giving my nipples a slight squeeze as I do so."
+                  Player:arousal += 2
+                EndIf
+                If isWearingUnderwear
+                  "I slip out of my panties stroking my swollen clit a few times."
+                  Player:arousal += 5
+                EndIf
+                If 0
+                  "I loosen my clothing up to show off more of my assets."
+                EndIf
+                "Giving myself one final once over I head back to <Target.him_or_her>."
+                Player.moveToPerson(Target)
+              Else
+                "I took a deep breath and resigned myself to my fate."
+                If isWearingUnderwear && isWearingBra
+                  "First slipping my panties off then my bra."
+                ElseIf isWearingUnderwear
+                  "Slipping my panties off."
+                Else
+                  "Slipping my bra off."
+                EndIf
+                Player.moveToPerson(Target)
+              EndIf
+              "<Target.He_or_She> didn't waste anytime"
+            Else
+              Target(Angry):: "Strip!"
+              0:: Player:masochist > 50:: "Make me!"
+              1:: "Strip..."
+
+              If 0
+                Target(Evil):: "Gladly!"
+                Target:likes_rough += 1
+                Player:masochist += 1
+                Player:likes_rough += 1
+                "<Target.He_or_She> storms over and grabs me by my hair!"
+                "They rip my clothing off with such force I hear it tearing, and a button goes flying across the room."
+                Player.strip()
+                0:: "Give in..."
+                1:: "Fight back!"
+
+                If 1
+                  "With an effort I nearly break free scratching <Target.him_or_her> in the process."
+                  "They smile at me..."
+                  Target(Evil):: "This is going to be fun!"
+                  Target:likes_rough += 1
+                  Player:masochist += 1
+                  Player:likes_rough += 1
+                  Player.dressBondage(Bdg_Handcuffs)
+                  Player.dressBondage(Bdg_Foulard)
+                EndIf
+                filter(Aggressive)
+                talkNonConsensual()
+                sexNoAffair(Target, Player)
+              Else
+                Player(Anxious):: "Yes <Target.Sir_or_Ma'am>."
+                "With nervous excitement I start stripping off my clothing."
+                While Player.isNaked()
+                  "Off this goes..."
+                  Player.stripOne()
+                EndWhile
+                sexNoAffair(Target, Player)
+              EndIf
+            EndIf
+          EndIf
+          Target:: "Hi, my name is <Target.name>. We should do this again some time. Tell me your number?"
+          "Should I exchange numbers with this stranger? This not what I would call a normal hook up."
+          0:: "Yes"
+          1:: "Yes <Target.Sir_or_Ma'am>"
+          2:: "No"
+
+          If 0
+            "We exchanged numbers and parted ways."
+            exchangeContact(Target)
+          ElseIf 1
+            "I gave my contact information to <Target.Sir_or_Ma'am>"
+            Player:masochist += 0.1
+            exchangeContact(Target)
+          ElseIf targetWillForce
+            "I pull out my phone and unlock it then think twice about it."
+            Player(Shy):: "Um... I don't think I should."
+            "<Target.name> snatches my phone out of my hands and quick load his number into my phone."
+            exchangeContact(Target)
+            Target(Evil):: "I wasn't asking."
+          Else
+            "Why would I? They just forced me, even if I did bait them."
+          EndIf
+          timeout(720, rizean_cnc_dropFlirt)
+        Else
+          If isPublic
+            "I started to take in a breath to let out a scream when I felt a sharp pain in my side."
+            Player(Pain):: "Ouch!"
+            Target(Evil):: "Dumb bitch! Do what I say, or you'll be dead before that can get you to the hospital!"
+            Target(Anger):: "Get up!"
+            Player(Scared):: "Ok..."
+            Target(Anger):: "That's, yes <Target.Sir_or_Ma'am> slut!, Do you under stand me?"
+            Player(Scared):: "Yes. I mean yes <Target.Sir_or_Ma'am>."
+            "Shakily, I get to my feet and <Target.he_or_she> pulls me in close."
+            loc = findNearbyBuilding(bathroom)
+            moveTo(loc)
+            "We make our way to the bath room where <Target.he_or_she> push me into a stall and closes the door."
+            Target(Evil):: "Scream, and it will be the last thing you ever do."
+            0:: "I understand, <Target.Sir_or_Ma'am>."
+            1:: Player:masochist > 75:: "I knew I wouldn't scream. This is what I wanted."
+            2:: Player:masochist > 90:: "<Target.Sir_or_Ma'am>, I don't know if I can control myself."
+
+            If 0
+              Player:masochist += Random(0, 2)
+              Player(Anxious):: "What would you like me to do <Target.Sir_or_Ma'am>?"
+              Target(Angry):: "Strip!"
+              Player.strip()
+              "I put on a small show for him, but he doesn't seem to care and only has one thing on his mind."
+              filter(Aggressive)
+              talkNonConsensual()
+              sexNoAffair(Target, Player)
+              cncActorIsMale = true
+              If Player.isInterestedInWomen() && Player.isInterestedInMen()
+                If Random(0, 1) > 0
+                  cncActorIsMale = false
+                EndIf
+              ElseIf Player.isInterestedInWomen()
+                cncActorIsMale = false
+              EndIf
+              CNCActor = generatePersonTemporary(fourties, bodybuilder)
+              CNCActor.dress()
+              If cncActorIsMale
+                CNCActor:likes_vaginal => Random(50, 100)
+                CNCActor:fertility => Random(5, 20)
+              Else
+                CNCActor = generatePersonTemporary(fourties, bodybuilder_F)
+                CNCActor:fertility => Random(0, 2)
+                CNCActor:stock_pill => Random(5, 20)
+              EndIf
+              CNCActor:masochist => Random(-100, -20)
+              CNCActor:likes_rough => Random(50, 100)
+              CNCActor:likes_anal => Random(50, 100)
+              CNCActor:likes_bondage => Random(50, 100)
+              CNCActor:prone_to_orgasm => Random(50, 100)
+              CNCActor:stock_condom => Random(5, 20)
+              "While we are going at it another <Opportunist.dude_or_chick> walks in just as <Target.he_or_she> finishes with me."
+              Target:: "Hey <Opportunist.budy_or_lady>, you want a go?"
+              CNCActor:: "Your kidding right?"
+              Target:: "Nope! Just on condition."
+              CNCActor:: "What's that?"
+              Target(Evil):: "Don't be gentle."
+              CNCActor(Evil):: "I think I can handle that."
+              filter(Aggressive)
+              talkNonConsensual()
+              sexNoAffair(CNCActor, Player)
+            ElseIf 1
+              Player:masochist += Random(0, 1)
+              Player:likes_rough += Random(0, 1)
+              Player(Scared):: "<Target.Sir_or_Ma'am> you can do what you want. Just please don't kill me."
+              Target(Angry):: "Strip!"
+              Player.strip()
+              "I quickly do as he asked, and he waste no time taking me to town."
+              filter(Aggressive)
+              talkNonConsensual()
+              sexNoAffair(Target, Player)
+              "They had their way with me and quickly left once they were satisfied."
+              If Player:arousal > 70
+                "They had used me but left me wanting more."
+                filter(Solo)
+                sex(Player)
+              EndIf
+              "Panic started to set in when I realized my clothes where missing!"
+              "I take a peek out of the stall and see my clothes in the trash."
+              sceneEnd()
+              Player.strip()
+            ElseIf 2
+              Player(Anxious):: "I don't know if I can do that..."
+              Player(Anxious):: "You should um... Tie my hands and gag me."
+              Player:masochist += 1
+              Player:likes_rough += 1
+              Target(Surprised):: "I see."
+              Target(Excited):: "You for got <Target.Sir_or_Ma'am>."
+              Player(Anxious):: "Sorry, <Target.Sir_or_Ma'am>."
+              Target(Excited):: "Take off you clothes slut. Then I will help you control yourself and give you the punishment you deserve."
+              Player(Excited):: "Yes, <Target.Sir_or_Ma'am>."
+              "Once I was done stripping <Target.he_or_she> gagged me."
+              Player.dressBondage(Bdg_Foulard)
+              "Then bound my hand behind my back."
+              Player.dressBondage(Bdg_Handcuffs)
+              Target(Excited):: "Now little slut it's time for your punishment!"
+              "I whimpered with excitement."
+              "They push me down, my face mere inches from toilet water."
+              "SMACK! I felt their had come down hard on my butt!"
+              Player(Pain):: "MMMMM!!!"
+              "I felt several more blows!"
+              Player(Pain):: "MMANM MMM MEMMM!!!"
+              Target(Excited):: "Oh? What's that you want more?"
+              0:: "Meekly nod my head yes..."
+              1:: "Vigorously, shake my head no, I've reached my breaking point!"
+
+              If 0
+                Player:masochist += 1
+                Player:likes_rough += 1
+                Target(Excited):: "Of course my little slut."
+                "Blow after blow lands on my butt with a few landing dangerously close to my <Target.dick_or_pussy>."
+                "Then it happened."
+                "They landed it directly on my <Target.dick_or_clit>"
+                "The pain surges through my body!"
+                Player(Pain):: "MMMMMMMMMMMMMMMMMMMMMMMMM!!!"
+                Target(Evil):: "Oh, I see you enjoyed that as much as I did!"
+                "They landed another directly on my <Target.dick_or_clit>!"
+                "The pain, once again surges through my body but this time it is quickly overtaken by the most powerful orgasm I have ever felt!"
+                "I lose track of time as it seems like it will never end."
+                "Slow I start to regain my senses."
+                "I'm shocked to find I am still extremely aroused!"
+                Player:arousal => 88
+                Player(Pain):: "Mmmm mmnmmn mmmnm."
+                "They pull my gag down for a moment."
+                Target(Curious):: "What is it my little slut?"
+              EndIf
+              filter(Aggressive)
+              talkNonConsensual()
+              sexNoAffair(Target, Player)
+              Target:: "Hi, my name is <Target.name>. We should do this again some time. Tell me your number?"
+              "Should I exchange numbers with this stranger? This not what I would call a normal hook up."
+              0:: "Yes"
+              1:: "Yes <Target.Sir_or_Ma'am>"
+              2:: "No"
+
+              If 0
+                "We exchanged numbers and parted ways."
+                exchangeContact(Target)
+              ElseIf 1
+                "I gave my contact information to <Target.Sir_or_Ma'am>"
+                Player:masochist += 0.1
+                exchangeContact(Target)
+              ElseIf targetWillForce
+                "I pull out my phone and unlock it then think twice about it."
+                Player(Shy):: "Um... I don't think I should."
+                "<Target.name> snatches my phone out of my hands and quick load his number into my phone."
+                exchangeContact(Target)
+                Target(Evil):: "I wasn't asking."
+              Else
+                "Why would I? They just forced me, even if I did bait them."
+              EndIf
+            EndIf
+          Else
+            Player(Scared):: "No! You're wrong."
+            Player(Scared):: "I never meant for it to go this far."
+            Target(Evil):: "Well it has and there are two ways this can end..."
+            0:: "The easy way"
+            1:: "The hard way"
+
+            If 0
+              Player(Scared):: "I'll take the easy way."
+              Target(Evil):: "I think you know what to do then."
+              While Player.isNude()
+                Player.stripOne()
+                Target(Evil):: "Keep going..."
+              EndWhile
+              filter(Aggressive)
+              talkNonConsensual()
+              sexNoAffair(Target, Player)
+            ElseIf 1
+              Player(Scared):: "I know how this is going to end, but I can't just give into you."
+              "I make a run for it, but <Target.he_or_she> knew what I was planning and I knew they knew."
+              "Some elaborate game we were both playing."
+              "<Target.He_or_She> forced me and started ripping my clothes off with out a care."
+              Player.stripOne()
+              Player.animate(knocked_out)
+              Player.stripOne()
+              "..."
+              Player.strip()
+              Target(Evil):: "Now less have some fun."
+              filter(Aggressive)
+              talkNonConsensual()
+              sexNoAffair(Target, Player)
+            EndIf
+          EndIf
+          "I hated every last second of it."
+          "I did! I really did!"
+          "But that's not what my body said."
+          "As much as I keep trying to convince myself this was a mistake..."
+          0:: "I would do it again without a second though!"
+          1:: "I might do it again"
+          2:: "I would not do it again for a long time if ever."
+          3:: "I would never do it again!"
+
+          If 0
+            Player:: "Um... Hey, you like to do this again sometime?"
+            Target(surprised):: "Would love to!"
+            exchangeContact(Target)
+          ElseIf 1
+            Player:: "Um... This was more that I had planed on, but maybe we can talk about it sometimes?"
+            Target(surprised):: "Ok, sure we can do that."
+            exchangeContact(Target)
+          ElseIf 2
+            Player(Scared):: "I'm going to leave now if that's ok?"
+            Target:: "Yeah, that sounds like a good idea."
+          ElseIf 3
+            "As they are recovering, I slip away as quietly as I can."
+          EndIf
+        EndIf
+      ElseIf 1
+      ElseIf 2
+        "I melted in to their arms."
+        forced = false
+        Player(Shy):: "What now?"
+        If isWearingUnderwear || isWearingBra
+          "<Target.He_or_She> wipes the tears off my face."
+          If undefined
+            Target:: "Go to the bathroom and take off you bra and underwear."
+            Player:: "..."
+            Player(Anxious):: "OK"
+            forced = true
+            loc = findNearbyBuilding(bathroom)
+            moveTo(loc)
+            "My fantasy had very quickly turned into a reality. Did I really want it?"
+            If forced
+              0:: Player:arousal > 60:: "My pussy was dripping wet. There was no doubt I really wanted this!"
+              1:: "Yes..."
+              2:: "No, but I had gone too far. <Target.He_or_She> was right though, so best I just get it over."
+
+            Else
+              0:: Player:arousal > 60:: "My pussy was dripping wet. There was no doubt I really wanted this!"
+              1:: "Yes..."
+
+            EndIf
+            If choice == 0 || choice == 1
+              "I smiled to myself and fixed my makeup."
+              If isWearingBra
+                "I slide off my bra giving my nipples a slight squeeze as I do so."
+                Player:arousal += 2
+              EndIf
+              If isWearingUnderwear
+                "I slip out of my panties stroking my swollen clit a few times."
+                Player:arousal += 5
+              EndIf
+              If 0
+                "I loosen my clothing up to show off more of my assets."
+              EndIf
+              "Giving myself one final once over I head back to <Target.him_or_her>."
+              Player.moveToPerson(Target)
+            Else
+              "I took a deep breath and resigned myself to my fate."
+              If isWearingUnderwear && isWearingBra
+                "First slipping my panties off then my bra."
+              ElseIf isWearingUnderwear
+                "Slipping my panties off."
+              Else
+                "Slipping my bra off."
+              EndIf
+              Player.moveToPerson(Target)
+            EndIf
+            "<Target.He_or_She> didn't waste anytime"
+          Else
+            Target(Angry):: "Strip!"
+            0:: Player:masochist > 50:: "Make me!"
+            1:: "Strip..."
+
+            If 0
+              Target(Evil):: "Gladly!"
+              Target:likes_rough += 1
+              Player:masochist += 1
+              Player:likes_rough += 1
+              "<Target.He_or_She> storms over and grabs me by my hair!"
+              "They rip my clothing off with such force I hear it tearing, and a button goes flying across the room."
+              Player.strip()
+              0:: "Give in..."
+              1:: "Fight back!"
+
+              If 1
+                "With an effort I nearly break free scratching <Target.him_or_her> in the process."
+                "They smile at me..."
+                Target(Evil):: "This is going to be fun!"
+                Target:likes_rough += 1
+                Player:masochist += 1
+                Player:likes_rough += 1
+                Player.dressBondage(Bdg_Handcuffs)
+                Player.dressBondage(Bdg_Foulard)
+              EndIf
+              filter(Aggressive)
+              talkNonConsensual()
+              sexNoAffair(Target, Player)
+            Else
+              Player(Anxious):: "Yes <Target.Sir_or_Ma'am>."
+              "With nervous excitement I start stripping off my clothing."
+              While Player.isNaked()
+                "Off this goes..."
+                Player.stripOne()
+              EndWhile
+              sexNoAffair(Target, Player)
+            EndIf
+          EndIf
+        EndIf
+        Target:: "Hi, my name is <Target.name>. We should do this again some time. Tell me your number?"
+        "Should I exchange numbers with this stranger? This not what I would call a normal hook up."
+        0:: "Yes"
+        1:: "Yes <Target.Sir_or_Ma'am>"
+        2:: "No"
+
+        If 0
+          "We exchanged numbers and parted ways."
+          exchangeContact(Target)
+        ElseIf 1
+          "I gave my contact information to <Target.Sir_or_Ma'am>"
+          Player:masochist += 0.1
+          exchangeContact(Target)
+        ElseIf undefined
+          "I pull out my phone and unlock it then think twice about it."
+          Player(Shy):: "Um... I don't think I should."
+          "<Target.name> snatches my phone out of my hands and quick load his number into my phone."
+          exchangeContact(Target)
+          Target(Evil):: "I wasn't asking."
+        Else
+          "Why would I? They just forced me, even if I did bait them."
+        EndIf
+        timeout(720, rizean_cnc_dropFlirt)
+      EndIf
+      timeout(600, rizean_cnc_dropFlirt)
+    ElseIf 4
+      "todo drop_flirt_non_submissive - player doesn't resist but is also not submissive"
+      Target(Grin):: "Exactly what you wanted."
+      "<Target.S> pulls me into a kiss."
+      animatePair(Target, Player, Kissing)
+      If Target:attractiveness > 70
+        "This <Target.dude_or_babe> is fucking hot!"
+        "I feel my body melting in <Target.his_or_her> arms."
+        Player:arousal += 5
+        "I feel <Target.his_or_her> hands starting to roam again. Should I put a stop to it?"
+        0:: "Encourage them"
+        1:: playerPerversionScore >= 100:: "A bit more than I wanted, push the hand away"
+        2:: playerPerversionScore >= 100:: "Ignore"
+        3:: playerPerversionScore >= 100 && Player:masochist > 50:: "Meekly 'try' to push the hand away and 'fail'"
+        4:: playerPerversionScore >= 100:: "Um, what do you think your doing?"
+
+      EndIf
+      timeout(600, rizean_cnc_dropFlirt)
+    EndIf
+  Else
+    "I catch <Target.him_or_her> checking my butt out."
+    Target:attractionToPlayer += 0.5
+    If targetPerversionScore < 50
+      "<Target.him_or_her> blushes and turns away."
+      Target:perversion += 0.1
+    Else
+      "<Target.He_or_She> didn't say a word but smiled at me. They definitely enjoyed what they saw."
+      Target:perversion += 0.3
+    EndIf
+    timeout(5, rizean_cnc_dropFlirt)
+  EndIf
+sceneEnd()
+

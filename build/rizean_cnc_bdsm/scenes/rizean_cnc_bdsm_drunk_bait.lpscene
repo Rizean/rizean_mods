@@ -1,0 +1,124 @@
+WHAT: none
+WHERE: none
+WHEN: 0 - 24
+WHO: none
+OTHER:
+
+sceneStart()
+  r = Random(0, 100)
+  If r > 50
+    "After way to many drinks..."
+    Actor = generatePersonTemporary(bodybuilder, creep)
+    Actor:likes_vaginal => Random(50, 100)
+    Actor:fertility => Random(2, 5)
+    Actor:masochist => Random(-100, -50)
+    Actor:likes_rough => Random(50, 100)
+    Actor:likes_anal => Random(50, 100)
+    Actor:likes_bondage => Random(50, 100)
+    Actor:prone_to_orgasm => Random(50, 100)
+    Actor:stock_condom => Random(5, 20)
+    Actor:arousal => Random(75, 85)
+    Actor:rapportwithplayer => 50 + Random(1, 10)
+    Actor:rapportwithplayer => 50 + Random(1, 10)
+    Actor.dress()
+    Actor.show(0)
+    Actor.moveToPerson(Player)
+    Actor(Annoyed):: "May, you have had too much to drink again. It's time to go."
+    Player(Confused):: "But my name is <Player.name>..."
+    "<Actor.S> puts <Actor.p> hand on the small of my back and leads me out."
+    Player(Confused):: "Where are we going?"
+    Actor(Evil):: "I'm taking you home of course."
+    Player(Confused):: "Oh, ok."
+    setBackground(residential)
+    "<Actor.S> slaps me hard on my ass as I walk into the home."
+    Player(Shocked):: "Ouch! Why did you do that?"
+    "That will teach you to get plastered in a place like that."
+    "<Actor.S> quickly strips off my clothes and binds my hands. I'm to drunk to put up much of a fight."
+    Player.strip()
+    Player.dressBondage(Bdg_Handcuffs)
+    Player(Anxious):: "Please... don't..."
+    "<Actor.S> quickly strips down and is no doubt ready!"
+    Actor.strip()
+    Actor(Evil):: "You're not the first dumb slut and won't be the last!"
+    talkNonConsensual()
+    filter(Aggressive)
+    sexNoAffair(Actor, Player)
+    perversionScore = Player:perversion + Player:masochist
+    If Random(0, 200) < perversionScore
+      Actor(Surprised):: "DAM! You wanted this didn't you? I don't think I've every see someone orgasms that hard before!"
+      Player(Embarrassed):: "No, I didn't want this..."
+      "<Actor.S> slaps me across the face!"
+      Actor(Surprised):: "Don't lie to me! You're a rape baiting slut! Admit it!"
+      "<Actor.S> grabs me by the hair and pushes me down and starts spanking me!"
+      Player(Pain):: "PLEASE STOP!"
+      Actor(Evil):: "Tell me what you are, and I'll stop."
+      Player(Embarrassed):: "I am a..."
+      Player(Embarrassed):: "SLUT!"
+      "I'm relieved as <Actor.s> stops spanking me."
+      Player(Drained):: "Can I please leave now? I promise I won't tell anyone."
+      Actor(Evil):: "I'm not done yet. That was just round one."
+      Player(Excited):: "Oh?..."
+      If perversionScore > 100
+        "A wave of excitement and arousal rolls over me."
+        If Player:arousal < 50
+          Player:arousal += Random(20, 40)
+        EndIf
+        If Player:arousal > 70
+          Actor(Excited):: "Look at you. Your practically dripping with excitement."
+          "My cheeks turn red as I look away, but I can't deny what they say."
+        EndIf
+      EndIf
+      filter(Anal)
+      sexNoAffair(Actor, Player)
+    EndIf
+    Player:energy -= Random(25, 50)
+    If Player:energy < 5
+      Player:energy => 5
+      "Eventually, I pass out."
+      Player.strip()
+      moveTo(home)
+    Else
+      "I can't believe I'm even considering this, but..."
+      0:: perversionScore > 125:: "Offer Number"
+      1:: "Get dresses and quietly leave"
+
+      If 0
+        Actor.makePermanent()
+        Player(Anxious):: "Um..."
+        Player(Anxious):: "Would you like my number?"
+        "After everything that has happened, I don't think <Actor.he_or_she> expected that."
+        Actor(Surprised):: "Well..."
+        Actor:: "Not usually into repeats."
+        "<Actor.S> smiles."
+        Actor:: "But, then again your not my usual type of <Player.boy_or_girl>."
+        exchangeContact(Actor)
+        Actor:: "Here, let me give you a ride home."
+        Player:: "Um... have you seen my clothes?"
+        "<Actor.S> smiles."
+        Actor(Evil):: "Just go get in the car before I spank you again."
+        "Embarrassed, I walk out and get in to the car nude."
+        Actor.dress()
+        moveTo(home)
+        "A short time latter we arrive at my place."
+        animatePair(Actor, Player, Kissing)
+        "..."
+        Actor:: "Turn around."
+        animatePair(Actor, Player, Hugging)
+        "<Actor.S> slaps me hard on my ass."
+        Actor(Grin):: "One more to remember me by."
+        "The night finally comes to an end with me passing out on my bed."
+        Player.animate(na_sleep)
+        passTime(4, 8)
+        Player:energy += Random(50, 100)
+      Else
+        "Eventually, <Actor.s> runs out of steam."
+        Actor.animate(na_sleep)
+        "Quietly as possible, I got dressed in the few pieces of clothing I could find."
+        Player.dressExcept(Bottom_Under, Top_Under)
+        moveTo(home)
+      EndIf
+    EndIf
+    timeout(600, rizean_cnc_bdsm_bait_rape)
+  EndIf
+sceneEnd()
+
